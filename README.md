@@ -6,8 +6,8 @@ https://twelvedata.com/docs
 # Features
 * Compatible with projects that target .NET Standard 2.0 including .NET Framework, .NET Core, and Xamarin
 * Aims to access all APIs (work in progress, starting with Time Series and Reference Data first)
-* Lightweight with with just a single external dependency (Newtonsoft.JSON)
-* Response data from APIs is converted automatically and ready to use, including conversion of numerical data in strings to the appropriate primtive type
+* Lightweight with just a single external dependency (Newtonsoft.JSON)
+* Response data is automatically converted to a more appropriate data type (i.e a stock price is provided as a string in JSON and then converted to a double)
 
 # Usage
 
