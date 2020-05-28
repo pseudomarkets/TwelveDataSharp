@@ -3,14 +3,28 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>TwelveDataSharp</PackageId>
-    <Version>1.0.0.1</Version>
+    <Version>1.0.0.2</Version>
     <Authors>Shravan Jambukesan</Authors>
     <Company>Pseudo Markets</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>A .NET Standard library for accessing stock market data from Twelve Data</Description>
+    <Copyright>(c) 2020 Pseudo Markets</Copyright>
+    <PackageProjectUrl>https://github.com/pseudomarkets/TwelveDataSharp</PackageProjectUrl>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageReleaseNotes>* Initial release</PackageReleaseNotes>
+    <PackageTags>twelvedata, stock data, twelve data, stock quotes</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

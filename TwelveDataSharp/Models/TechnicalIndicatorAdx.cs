@@ -5,19 +5,19 @@ using Newtonsoft.Json;
 
 namespace TwelveDataSharp.Models
 {
-    public class TechnicalIndicatorAvg
+    public partial class TechnicalIndicatorAdx
     {
         [JsonProperty("meta")]
-        public AvgMeta Meta { get; set; }
+        public AdxMeta Meta { get; set; }
 
         [JsonProperty("values")]
-        public List<AvgValue> Values { get; set; }
+        public List<AdxValue> Values { get; set; }
 
         [JsonProperty("status")]
         public string Status { get; set; }
     }
 
-    public partial class AvgMeta
+    public partial class AdxMeta
     {
         [JsonProperty("symbol")]
         public string Symbol { get; set; }
@@ -38,27 +38,24 @@ namespace TwelveDataSharp.Models
         public string Type { get; set; }
 
         [JsonProperty("indicator")]
-        public Indicator Indicator { get; set; }
+        public AdxIndicator Indicator { get; set; }
     }
 
-    public partial class Indicator
+    public partial class AdxIndicator
     {
         [JsonProperty("name")]
         public string Name { get; set; }
-
-        [JsonProperty("series_type")]
-        public string SeriesType { get; set; }
 
         [JsonProperty("time_period")]
         public long TimePeriod { get; set; }
     }
 
-    public partial class AvgValue
+    public partial class AdxValue
     {
         [JsonProperty("datetime")]
         public DateTimeOffset Datetime { get; set; }
 
-        [JsonProperty("avg")]
-        public string Avg { get; set; }
+        [JsonProperty("adx")]
+        public string Adx { get; set; }
     }
 }

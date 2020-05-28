@@ -5,19 +5,19 @@ using Newtonsoft.Json;
 
 namespace TwelveDataSharp.Models
 {
-    public class TechnicalIndicatorAvg
+    public partial class TechnicalIndicatorBbands
     {
         [JsonProperty("meta")]
-        public AvgMeta Meta { get; set; }
+        public BbandsMeta Meta { get; set; }
 
         [JsonProperty("values")]
-        public List<AvgValue> Values { get; set; }
+        public List<BbandsValue> Values { get; set; }
 
         [JsonProperty("status")]
         public string Status { get; set; }
     }
 
-    public partial class AvgMeta
+    public partial class BbandsMeta
     {
         [JsonProperty("symbol")]
         public string Symbol { get; set; }
@@ -38,13 +38,19 @@ namespace TwelveDataSharp.Models
         public string Type { get; set; }
 
         [JsonProperty("indicator")]
-        public Indicator Indicator { get; set; }
+        public BbandsIndicator Indicator { get; set; }
     }
 
-    public partial class Indicator
+    public partial class BbandsIndicator
     {
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("ma_type")]
+        public string MaType { get; set; }
+
+        [JsonProperty("sd")]
+        public long Sd { get; set; }
 
         [JsonProperty("series_type")]
         public string SeriesType { get; set; }
@@ -53,12 +59,18 @@ namespace TwelveDataSharp.Models
         public long TimePeriod { get; set; }
     }
 
-    public partial class AvgValue
+    public partial class BbandsValue
     {
         [JsonProperty("datetime")]
         public DateTimeOffset Datetime { get; set; }
 
-        [JsonProperty("avg")]
-        public string Avg { get; set; }
+        [JsonProperty("upper_band")]
+        public string UpperBand { get; set; }
+
+        [JsonProperty("middle_band")]
+        public string MiddleBand { get; set; }
+
+        [JsonProperty("lower_band")]
+        public string LowerBand { get; set; }
     }
 }
