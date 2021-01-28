@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TwelveDataSharp.Models;
 using TwelveDataSharp.DataModels;
+using TwelveDataSharp.Interfaces;
 
 /*
  * TwelveDataSharp - a .NET Standard 2.0 library for accessing stock market data from Twelve Data
@@ -14,13 +15,15 @@ using TwelveDataSharp.DataModels;
 
 namespace TwelveDataSharp
 {
-    public class TwelveDataClient
+    public class TwelveDataClient : ITwelveDataClient
     {
-        private string apiKey = "";
+        private string _apiKey = string.Empty;
+        private readonly HttpClient _client;
 
-        public TwelveDataClient(string key)
+        public TwelveDataClient(string key, HttpClient client)
         {
-            apiKey = key;
+            _apiKey = key;
+            _client = client;
         }
 
         /*
@@ -33,9 +36,8 @@ namespace TwelveDataSharp
         {
             try
             {
-                var client = new HttpClient();
-                string endpoint = "https://api.twelvedata.com/quote?symbol=" + symbol + "&interval=" + interval + "&apikey=" + apiKey;
-                var response = await client.GetAsync(endpoint);
+                string endpoint = "https://api.twelvedata.com/quote?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TimeSeriesQuote>(responseString);
                 TwelveDataQuote quote = new TwelveDataQuote()
@@ -78,9 +80,8 @@ namespace TwelveDataSharp
         {
             try
             {
-                var client = new HttpClient();
-                string endpoint = "https://api.twelvedata.com/price?symbol=" + symbol + "&apikey=" + apiKey;
-                var response = await client.GetAsync(endpoint);
+                string endpoint = "https://api.twelvedata.com/price?symbol=" + symbol + "&apikey=" + _apiKey;
+                var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TimeSeriesRealTimePrice>(responseString);
                 TwelveDataPrice realTimePrice = new TwelveDataPrice()
@@ -108,9 +109,8 @@ namespace TwelveDataSharp
         {
             try
             {
-                var client = new HttpClient();
-                string endpoint = "https://api.twelvedata.com/time_series?symbol=" + symbol + "&interval=" + interval + "&apikey=" + apiKey;
-                var response = await client.GetAsync(endpoint);
+                string endpoint = "https://api.twelvedata.com/time_series?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TimeSeriesStocks>(responseString);
                 List<TimeSeriesValues> values = new List<TimeSeriesValues>();
@@ -160,8 +160,8 @@ namespace TwelveDataSharp
             try
             {
                 var client = new HttpClient();
-                string endpoint = "https://api.twelvedata.com/avg?symbol=" + symbol + "&interval=" + interval + "&apikey=" + apiKey;
-                var response = await client.GetAsync(endpoint);
+                string endpoint = "https://api.twelvedata.com/avg?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TechnicalIndicatorAvg>(responseString);
                 List<TimeSeriesAverages> values = new List<TimeSeriesAverages>();
@@ -211,9 +211,8 @@ namespace TwelveDataSharp
         {
             try
             {
-                var client = new HttpClient();
-                string endpoint = "https://api.twelvedata.com/adx?symbol=" + symbol + "&interval=" + interval + "&apikey=" + apiKey;
-                var response = await client.GetAsync(endpoint);
+                string endpoint = "https://api.twelvedata.com/adx?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TechnicalIndicatorAdx>(responseString);
                 List<AdxValues> values = new List<AdxValues>();
@@ -262,9 +261,8 @@ namespace TwelveDataSharp
         {
             try
             {
-                var client = new HttpClient();
-                string endpoint = "https://api.twelvedata.com/bbands?symbol=" + symbol + "&interval=" + interval + "&apikey=" + apiKey;
-                var response = await client.GetAsync(endpoint);
+                string endpoint = "https://api.twelvedata.com/bbands?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TechnicalIndicatorBbands>(responseString);
                 List<BollingerBandValue> values = new List<BollingerBandValue>();
