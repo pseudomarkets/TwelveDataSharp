@@ -13,17 +13,7 @@ https://twelvedata.com/docs
 https://www.nuget.org/packages/TwelveDataSharp/
 
 # Usage
-
-Just create a client object with your Twelve Data API key and call the async function for the respective API endpoint you'd like to hit. Additional detailed documentation is coming soon.
-
-`using TwelveDataSharp;`
-
-`TwelveDataClient client = new TwelveDataClient("YOUR_API_KEY_HERE");`
-
-`var response = await client.GetTimeSeriesAsync("AAPL");`
-
-`Console.WriteLine("Open:" + response.Values[0].Open);`
-
+Documentation is available under the wiki: https://github.com/pseudomarkets/TwelveDataSharp/wiki/Getting-Started
 
 # Notice
 This is NOT an official Twelve Data library, and the author of this library is not affiliated with Twelve Data in any way, shape or form. Twelve Data APIs and data are Copyright © 2020 Twelve Data Pte. Ltd.
