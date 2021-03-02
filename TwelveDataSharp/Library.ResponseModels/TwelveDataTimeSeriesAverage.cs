@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace TwelveDataSharp.DataModels
+namespace TwelveDataSharp.Library.ResponseModels
 {
     public class TwelveDataTimeSeriesAverage
     {
@@ -16,11 +15,13 @@ namespace TwelveDataSharp.DataModels
         public string SeriesType { get; set; }
         public long TimePeriod { get; set; }
         public List<TimeSeriesAverages> Values { get; set; }
+        public Enums.TwelveDataClientResponseStatus ResponseStatus { get; set; }
+        public string ResponseMessage { get; set; } = "RESPONSE_OK";
     }
 
     public partial class TimeSeriesAverages
     {
         public double AverageValue { get; set; }
-        public DateTimeOffset Datetime { get; set; }
+        public DateTime Datetime { get; set; }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using TwelveDataSharp.Models;
-using TwelveDataSharp.DataModels;
+using TwelveDataSharp.Api.ResponseModels;
 using TwelveDataSharp.Interfaces;
+using TwelveDataSharp.Library.ResponseModels;
 
 /*
  * TwelveDataSharp - a .NET Standard 2.0 library for accessing stock market data from Twelve Data
@@ -17,7 +18,7 @@ namespace TwelveDataSharp
 {
     public class TwelveDataClient : ITwelveDataClient
     {
-        private string _apiKey = string.Empty;
+        private readonly string _apiKey;
         private readonly HttpClient _client;
 
         public TwelveDataClient(string key, HttpClient client)
@@ -36,23 +37,27 @@ namespace TwelveDataSharp
         {
             try
             {
-                string endpoint = "https://api.twelvedata.com/quote?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                string endpoint = "https://api.twelvedata.com/quote?symbol=" + symbol + "&interval=" + interval +
+                                  "&apikey=" + _apiKey;
                 var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TimeSeriesQuote>(responseString);
+                var jsonResponse = JsonConvert.DeserializeObject<TimeSeriesQuote>(responseString);
                 TwelveDataQuote quote = new TwelveDataQuote()
                 {
+                    Symbol = jsonResponse?.Symbol,
                     Name = jsonResponse?.Name,
-                    Datetime = jsonResponse.Datetime,
+                    Exchange = jsonResponse?.Exchange,
+                    Currency = jsonResponse?.Currency,
+                    Datetime = jsonResponse?.Datetime ?? DateTime.MinValue,
                     Open = Convert.ToDouble(jsonResponse?.Open),
                     Close = Convert.ToDouble(jsonResponse?.Close),
                     High = Convert.ToDouble(jsonResponse?.High),
                     Low = Convert.ToDouble(jsonResponse?.Low),
-                    Volume = jsonResponse.Volume,
+                    Volume = jsonResponse?.Volume ?? 0,
                     PreviousClose = Convert.ToDouble(jsonResponse?.PreviousClose),
                     Change = Convert.ToDouble(jsonResponse?.Change),
                     PercentChange = Convert.ToDouble(jsonResponse?.PercentChange),
-                    AverageVolume = jsonResponse.AverageVolume,
+                    AverageVolume = jsonResponse?.AverageVolume ?? 0,
                     FiftyTwoWeekHigh = Convert.ToDouble(jsonResponse?.FiftyTwoWeek?.High),
                     FiftyTwoWeekLow = Convert.ToDouble(jsonResponse?.FiftyTwoWeek?.Low),
                     FiftyTwoWeekHighChange = Convert.ToDouble(jsonResponse?.FiftyTwoWeek?.HighChange),
@@ -61,15 +66,22 @@ namespace TwelveDataSharp
                     FiftyTwoWeekLowChangePercent = Convert.ToDouble(jsonResponse?.FiftyTwoWeek?.LowChangePercent),
                     FiftyTwoWeekRange = jsonResponse?.FiftyTwoWeek?.Range
                 };
+
+                if (!string.IsNullOrEmpty(quote.Symbol) && quote.Datetime != DateTime.MinValue) 
+                    return quote;
+                quote.ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataApiError;
+                quote.ResponseMessage = "Invalid symbol or bad API key";
+
                 return quote;
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("TwelveDataSharp - GetRealTimePriceAsync could not retrieve data from Twelve Data, please check your API Key and interval");
-                System.Diagnostics.Debug.WriteLine(e);
-                throw;
+                return new TwelveDataQuote()
+                {
+                    ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataSharpError,
+                    ResponseMessage = e.ToString()
+                };
             }
-
         }
 
         /*
@@ -83,20 +95,26 @@ namespace TwelveDataSharp
                 string endpoint = "https://api.twelvedata.com/price?symbol=" + symbol + "&apikey=" + _apiKey;
                 var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TimeSeriesRealTimePrice>(responseString);
+                var jsonResponse = JsonConvert.DeserializeObject<TimeSeriesRealTimePrice>(responseString);
                 TwelveDataPrice realTimePrice = new TwelveDataPrice()
                 {
                     Price = Convert.ToDouble(jsonResponse?.Price)
                 };
+
+                if (!realTimePrice.Price.Equals(0)) return realTimePrice;
+                realTimePrice.ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataApiError;
+                realTimePrice.ResponseMessage = "Invalid symbol or bad API key";
+
                 return realTimePrice;
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("TwelveDataSharp - GetRealTimePriceAsync could not retrieve data from Twelve Data, please check your API Key and interval");
-                System.Diagnostics.Debug.WriteLine(e);
-                throw;
+                return new TwelveDataPrice()
+                {
+                    ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataSharpError,
+                    ResponseMessage = e.ToString()
+                };
             }
-
         }
 
         /*
@@ -109,25 +127,26 @@ namespace TwelveDataSharp
         {
             try
             {
-                string endpoint = "https://api.twelvedata.com/time_series?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                string endpoint = "https://api.twelvedata.com/time_series?symbol=" + symbol + "&interval=" + interval +
+                                  "&apikey=" + _apiKey;
                 var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TimeSeriesStocks>(responseString);
+                var jsonResponse = JsonConvert.DeserializeObject<TimeSeriesStocks>(responseString);
                 List<TimeSeriesValues> values = new List<TimeSeriesValues>();
-                var tsStockValues = jsonResponse.Values;
-                foreach (Value v in tsStockValues)
+                var tsStockValues = jsonResponse?.Values;
+                if (tsStockValues != null)
                 {
-                    TimeSeriesValues val = new TimeSeriesValues()
+                    values.AddRange(tsStockValues.Select(v => new TimeSeriesValues()
                     {
-                        Datetime = v.Datetime,
+                        Datetime = v?.Datetime ?? DateTime.MinValue,
                         Open = Convert.ToDouble(v?.Open),
                         High = Convert.ToDouble(v?.High),
                         Low = Convert.ToDouble(v?.Low),
                         Close = Convert.ToDouble(v?.Close),
                         Volume = v.Volume
-                    };
-                    values.Add(val);
+                    }));
                 }
+
                 TwelveDataTimeSeries timeSeries = new TwelveDataTimeSeries()
                 {
                     Symbol = jsonResponse?.Meta?.Symbol,
@@ -138,15 +157,22 @@ namespace TwelveDataSharp
                     Currency = jsonResponse?.Meta?.Currency,
                     Values = values
                 };
+
+                if (!string.IsNullOrEmpty(timeSeries?.Symbol) && values.Count != 0) 
+                    return timeSeries;
+                timeSeries.ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataApiError;
+                timeSeries.ResponseMessage = "Invalid symbol or API key";
+
                 return timeSeries;
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("TwelveDataSharp - GetTimeSeriesAsync could not retrieve data from Twelve Data, please check your API Key and interval");
-                System.Diagnostics.Debug.WriteLine(e);
-                throw;
+                return new TwelveDataTimeSeries()
+                {
+                    ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataSharpError,
+                    ResponseMessage = e.ToString()
+                };
             }
-
         }
 
         /*
@@ -155,25 +181,24 @@ namespace TwelveDataSharp
          * interval - supports intervals "1min", "5min", "15min", "30min", "45min", "1h", "2h", "4h", "1day", "1week", and "1month"
          * with a default value set to "1min"
          */
-        public async Task<TwelveDataTimeSeriesAverage> GetTimeSeriesAverageAsync(string symbol, string interval = "1min")
+        public async Task<TwelveDataTimeSeriesAverage> GetTimeSeriesAverageAsync(string symbol,
+            string interval = "1min")
         {
             try
             {
                 var client = new HttpClient();
-                string endpoint = "https://api.twelvedata.com/avg?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                string endpoint = "https://api.twelvedata.com/avg?symbol=" + symbol + "&interval=" + interval +
+                                  "&apikey=" + _apiKey;
                 var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TechnicalIndicatorAvg>(responseString);
+                var jsonResponse = JsonConvert.DeserializeObject<TechnicalIndicatorAvg>(responseString);
                 List<TimeSeriesAverages> values = new List<TimeSeriesAverages>();
-                var tsAverageValues = jsonResponse.Values;
-                foreach (AvgValue v in tsAverageValues)
+                var tsAverageValues = jsonResponse?.Values;
+
+                if (tsAverageValues != null)
                 {
-                    TimeSeriesAverages val = new TimeSeriesAverages()
-                    {
-                        AverageValue = Convert.ToDouble(v?.Avg),
-                        Datetime = v.Datetime,
-                    };
-                    values.Add(val);
+                    values.AddRange(tsAverageValues.Select(v => new TimeSeriesAverages()
+                        {AverageValue = Convert.ToDouble(v?.Avg), Datetime = v?.Datetime ?? DateTime.MinValue}));
                 }
 
                 TwelveDataTimeSeriesAverage timeSeriesAverage = new TwelveDataTimeSeriesAverage()
@@ -186,19 +211,25 @@ namespace TwelveDataSharp
                     Type = jsonResponse?.Meta?.Type,
                     IndicatorName = jsonResponse?.Meta?.Indicator?.Name,
                     SeriesType = jsonResponse?.Meta?.Indicator?.SeriesType,
-                    TimePeriod = jsonResponse.Meta.Indicator.TimePeriod,
+                    TimePeriod = jsonResponse?.Meta?.Indicator?.TimePeriod ?? 0,
                     Values = values
                 };
+
+                if (!string.IsNullOrEmpty(timeSeriesAverage.Symbol) && values.Count != 0) 
+                    return timeSeriesAverage;
+                timeSeriesAverage.ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataApiError;
+                timeSeriesAverage.ResponseMessage = "Invalid symbol or API key";
 
                 return timeSeriesAverage;
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("TwelveDataSharp - GetTimeSeriesAverageAsync could not retrieve data from Twelve Data, please check your API Key and interval");
-                System.Diagnostics.Debug.WriteLine(e);
-                throw;
+                return new TwelveDataTimeSeriesAverage()
+                {
+                    ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataSharpError,
+                    ResponseMessage = e.ToString()
+                };
             }
-
         }
 
         /*
@@ -211,20 +242,18 @@ namespace TwelveDataSharp
         {
             try
             {
-                string endpoint = "https://api.twelvedata.com/adx?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                string endpoint = "https://api.twelvedata.com/adx?symbol=" + symbol + "&interval=" + interval +
+                                  "&apikey=" + _apiKey;
                 var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TechnicalIndicatorAdx>(responseString);
+                var jsonResponse = JsonConvert.DeserializeObject<TechnicalIndicatorAdx>(responseString);
                 List<AdxValues> values = new List<AdxValues>();
-                var adxValues = jsonResponse.Values;
-                foreach (AdxValue a in adxValues)
+                var adxValues = jsonResponse?.Values;
+
+                if (adxValues != null)
                 {
-                    AdxValues val = new AdxValues()
-                    {
-                        AdxValue = Convert.ToDouble(a?.Adx),
-                        Datetime = a.Datetime
-                    };
-                    values.Add(val);
+                    values.AddRange(adxValues.Select(a => new AdxValues()
+                        {AdxValue = Convert.ToDouble(a?.Adx), Datetime = a?.Datetime ?? DateTime.MinValue}));
                 }
 
                 TwelveDataAdx adx = new TwelveDataAdx()
@@ -236,19 +265,25 @@ namespace TwelveDataSharp
                     Exchange = jsonResponse?.Meta?.Exchange,
                     Type = jsonResponse?.Meta?.Type,
                     IndicatorName = jsonResponse?.Meta?.Indicator?.Name,
-                    TimePeriod = jsonResponse.Meta.Indicator.TimePeriod,
+                    TimePeriod = jsonResponse?.Meta?.Indicator?.TimePeriod ?? 0,
                     Values = values
                 };
+
+                if (!string.IsNullOrEmpty(adx.Symbol) && adx.Values.Count != 0) 
+                    return adx;
+                adx.ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataApiError;
+                adx.ResponseMessage = "Invalid symbol or API key";
 
                 return adx;
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("TwelveDataSharp - GetAdxAsync could not retrieve data from Twelve Data, please check your API Key and interval");
-                System.Diagnostics.Debug.WriteLine(e);
-                throw;
+                return new TwelveDataAdx()
+                {
+                    ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataSharpError,
+                    ResponseMessage = e.ToString()
+                };
             }
-
         }
 
         /*
@@ -257,26 +292,25 @@ namespace TwelveDataSharp
          * interval - supports intervals "1min", "5min", "15min", "30min", "45min", "1h", "2h", "4h", "1day", "1week", and "1month"
          * with a default value set to "1min"
          */
-        public async Task<TwelveDataBollingerBands> GetBollingerBands(string symbol, string interval = "1min")
+        public async Task<TwelveDataBollingerBands> GetBollingerBandsAsync(string symbol, string interval = "1min")
         {
             try
             {
-                string endpoint = "https://api.twelvedata.com/bbands?symbol=" + symbol + "&interval=" + interval + "&apikey=" + _apiKey;
+                string endpoint = "https://api.twelvedata.com/bbands?symbol=" + symbol + "&interval=" + interval +
+                                  "&apikey=" + _apiKey;
                 var response = await _client.GetAsync(endpoint);
                 string responseString = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JsonConvert.DeserializeObject<TwelveDataSharp.Models.TechnicalIndicatorBbands>(responseString);
+                var jsonResponse = JsonConvert.DeserializeObject<TechnicalIndicatorBbands>(responseString);
                 List<BollingerBandValue> values = new List<BollingerBandValue>();
-                var bbandValues = jsonResponse.Values;
-                foreach (BbandsValue b in bbandValues)
+                var bbandValues = jsonResponse?.Values;
+
+                if (bbandValues != null)
                 {
-                    BollingerBandValue val = new BollingerBandValue()
+                    values.AddRange(bbandValues.Select(b => new BollingerBandValue()
                     {
-                        UpperBand = Convert.ToDouble(b?.UpperBand),
-                        MiddleBand = Convert.ToDouble(b?.MiddleBand),
-                        LowerBand = Convert.ToDouble(b?.LowerBand),
-                        Datetime = b.Datetime
-                    };
-                    values.Add(val);
+                        UpperBand = Convert.ToDouble(b?.UpperBand), MiddleBand = Convert.ToDouble(b?.MiddleBand),
+                        LowerBand = Convert.ToDouble(b?.LowerBand), Datetime = b?.Datetime ?? DateTime.MinValue
+                    }));
                 }
 
                 TwelveDataBollingerBands bollingerBands = new TwelveDataBollingerBands()
@@ -289,22 +323,27 @@ namespace TwelveDataSharp
                     Type = jsonResponse?.Meta?.Type,
                     IndicatorName = jsonResponse?.Meta?.Indicator?.Name,
                     MovingAverageType = jsonResponse?.Meta?.Indicator?.MaType,
-                    StandardDeviation = jsonResponse.Meta.Indicator.Sd,
+                    StandardDeviation = jsonResponse?.Meta?.Indicator?.Sd ?? 0,
                     SeriesType = jsonResponse?.Meta?.Indicator?.SeriesType,
-                    TimePeriod = jsonResponse.Meta.Indicator.TimePeriod,
+                    TimePeriod = jsonResponse?.Meta?.Indicator?.TimePeriod ?? 0,
                     Values = values
                 };
 
-                return bollingerBands;
+                if (!string.IsNullOrEmpty(bollingerBands.Symbol) && bollingerBands.Values.Count != 0)
+                    return bollingerBands;
+                bollingerBands.ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataApiError;
+                bollingerBands.ResponseMessage = "Invalid symbol or API key";
 
+                return bollingerBands;
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("TwelveDataSharp - GetBollingerBandsAsync could not retrieve data from Twelve Data, please check your API Key and interval");
-                System.Diagnostics.Debug.WriteLine(e);
-                throw;
+                return new TwelveDataBollingerBands()
+                {
+                    ResponseStatus = Enums.TwelveDataClientResponseStatus.TwelveDataSharpError,
+                    ResponseMessage = e.ToString()
+                };
             }
         }
-
     }
 }

@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>TwelveDataSharp</PackageId>
-    <Version>1.0.0.3</Version>
+    <Version>1.1.0</Version>
     <Authors>Shravan Jambukesan</Authors>
     <Company>Pseudo Markets</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -12,7 +12,13 @@
     <PackageProjectUrl>https://github.com/pseudomarkets/TwelveDataSharp</PackageProjectUrl>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageReleaseNotes>* Updated to support DI</PackageReleaseNotes>
+    <PackageReleaseNotes>
+      * Bug fix for GetQuoteAsync missing symbol
+      * Added unit tests
+      * Renamed and improved data model structure
+      * Added response status for all methods
+      * Improved null checks on all methods
+    </PackageReleaseNotes>
     <PackageTags>twelvedata, stock data, twelve data, stock quotes</PackageTags>
   </PropertyGroup>
 

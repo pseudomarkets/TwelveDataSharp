@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace TwelveDataSharp.DataModels
+namespace TwelveDataSharp.Library.ResponseModels
 {
     public class TwelveDataAdx
     {
@@ -15,11 +14,13 @@ namespace TwelveDataSharp.DataModels
         public string IndicatorName { get; set; }
         public long TimePeriod { get; set; }
         public List<AdxValues> Values { get; set; }
+        public Enums.TwelveDataClientResponseStatus ResponseStatus { get; set; }
+        public string ResponseMessage { get; set; } = "RESPONSE_OK";
     }
 
     public partial class AdxValues
     {
         public double AdxValue { get; set; }
-        public DateTimeOffset Datetime { get; set; }
+        public DateTime Datetime { get; set; }
     }
 }

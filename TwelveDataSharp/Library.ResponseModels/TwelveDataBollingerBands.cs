@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace TwelveDataSharp.DataModels
+namespace TwelveDataSharp.Library.ResponseModels
 {
     public class TwelveDataBollingerBands
     {
@@ -17,7 +16,9 @@ namespace TwelveDataSharp.DataModels
         public long StandardDeviation { get; set; }
         public string SeriesType { get; set; }
         public long TimePeriod { get; set; }
-        public List<BollingerBandValue> Values { get; set; } 
+        public List<BollingerBandValue> Values { get; set; }
+        public Enums.TwelveDataClientResponseStatus ResponseStatus { get; set; }
+        public string ResponseMessage { get; set; } = "RESPONSE_OK";
     }
 
     public partial class BollingerBandValue
@@ -25,6 +26,6 @@ namespace TwelveDataSharp.DataModels
         public double UpperBand { get; set; }
         public double LowerBand { get; set; }
         public double MiddleBand { get; set; }
-        public DateTimeOffset Datetime { get; set; }
+        public DateTime Datetime { get; set; }
     }
 }

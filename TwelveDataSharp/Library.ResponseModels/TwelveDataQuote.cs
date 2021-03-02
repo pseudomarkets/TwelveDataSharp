@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace TwelveDataSharp.DataModels
+namespace TwelveDataSharp.Library.ResponseModels
 {
     public class TwelveDataQuote
     {
         public string Symbol { get; set; }
-        public string Name { get; set; }
-        public DateTimeOffset Datetime { get; set; }
+        public string Name { get; set; } 
+        public string Exchange { get; set; }
+        public string Currency { get; set; }
+        public DateTime Datetime { get; set; }
         public double Open { get; set; }
         public double Close { get; set; }
         public double High { get; set; }
@@ -25,5 +25,7 @@ namespace TwelveDataSharp.DataModels
         public double FiftyTwoWeekHighChangePercent { get; set; }
         public double FiftyTwoWeekLowChangePercent { get; set; }
         public string FiftyTwoWeekRange { get; set; }
+        public Enums.TwelveDataClientResponseStatus ResponseStatus { get; set; }
+        public string ResponseMessage { get; set; } = "RESPONSE_OK";
     }
 }

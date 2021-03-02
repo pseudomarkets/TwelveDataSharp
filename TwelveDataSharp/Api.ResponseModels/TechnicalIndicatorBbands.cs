@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json;
 
-namespace TwelveDataSharp.Models
+namespace TwelveDataSharp.Api.ResponseModels
 {
     public partial class TechnicalIndicatorBbands
     {
@@ -62,7 +61,7 @@ namespace TwelveDataSharp.Models
     public partial class BbandsValue
     {
         [JsonProperty("datetime")]
-        public DateTimeOffset Datetime { get; set; }
+        public DateTime Datetime { get; set; }
 
         [JsonProperty("upper_band")]
         public string UpperBand { get; set; }

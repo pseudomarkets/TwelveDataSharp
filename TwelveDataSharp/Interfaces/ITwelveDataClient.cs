@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using TwelveDataSharp.DataModels;
+using TwelveDataSharp.Library.ResponseModels;
 
 namespace TwelveDataSharp.Interfaces
 {
@@ -14,6 +14,6 @@ namespace TwelveDataSharp.Interfaces
         Task<TwelveDataTimeSeries> GetTimeSeriesAsync(string symbol, string interval = "1min");
         Task<TwelveDataTimeSeriesAverage> GetTimeSeriesAverageAsync(string symbol, string interval = "1min");
         Task<TwelveDataAdx> GetAdxValuesAsync(string symbol, string interval = "1min");
-        Task<TwelveDataBollingerBands> GetBollingerBands(string symbol, string interval = "1min");
+        Task<TwelveDataBollingerBands> GetBollingerBandsAsync(string symbol, string interval = "1min");
     }
 }

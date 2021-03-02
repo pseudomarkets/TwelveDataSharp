@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace TwelveDataSharp.DataModels
+namespace TwelveDataSharp.Library.ResponseModels
 {
     public class TwelveDataTimeSeries
     {
@@ -13,11 +12,13 @@ namespace TwelveDataSharp.DataModels
         public string Type { get; set; }
         public string Currency { get; set; }
         public List<TimeSeriesValues> Values { get; set; }
+        public Enums.TwelveDataClientResponseStatus ResponseStatus { get; set; }
+        public string ResponseMessage { get; set; } = "RESPONSE_OK";
     }
 
     public partial class TimeSeriesValues
     {
-        public DateTimeOffset Datetime { get; set; }
+        public DateTime Datetime { get; set; }
         public double Open { get; set; }
         public double High { get; set; }
         public double Low { get; set; }

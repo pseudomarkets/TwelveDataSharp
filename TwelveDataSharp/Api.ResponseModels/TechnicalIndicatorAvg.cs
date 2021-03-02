@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json;
 
-namespace TwelveDataSharp.Models
+namespace TwelveDataSharp.Api.ResponseModels
 {
-    public partial class TechnicalIndicatorAdx
+    public class TechnicalIndicatorAvg
     {
         [JsonProperty("meta")]
-        public AdxMeta Meta { get; set; }
+        public AvgMeta Meta { get; set; }
 
         [JsonProperty("values")]
-        public List<AdxValue> Values { get; set; }
+        public List<AvgValue> Values { get; set; }
 
         [JsonProperty("status")]
         public string Status { get; set; }
     }
 
-    public partial class AdxMeta
+    public partial class AvgMeta
     {
         [JsonProperty("symbol")]
         public string Symbol { get; set; }
@@ -38,24 +37,27 @@ namespace TwelveDataSharp.Models
         public string Type { get; set; }
 
         [JsonProperty("indicator")]
-        public AdxIndicator Indicator { get; set; }
+        public Indicator Indicator { get; set; }
     }
 
-    public partial class AdxIndicator
+    public partial class Indicator
     {
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("series_type")]
+        public string SeriesType { get; set; }
 
         [JsonProperty("time_period")]
         public long TimePeriod { get; set; }
     }
 
-    public partial class AdxValue
+    public partial class AvgValue
     {
         [JsonProperty("datetime")]
-        public DateTimeOffset Datetime { get; set; }
+        public DateTime Datetime { get; set; }
 
-        [JsonProperty("adx")]
-        public string Adx { get; set; }
+        [JsonProperty("avg")]
+        public string Avg { get; set; }
     }
 }

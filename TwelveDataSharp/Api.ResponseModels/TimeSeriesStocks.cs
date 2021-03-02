@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json;
 
-namespace TwelveDataSharp.Models
+namespace TwelveDataSharp.Api.ResponseModels
 {
     public class TimeSeriesStocks
     {
@@ -41,7 +40,7 @@ namespace TwelveDataSharp.Models
     public partial class Value
     {
         [JsonProperty("datetime")]
-        public DateTimeOffset Datetime { get; set; }
+        public DateTime Datetime { get; set; }
 
         [JsonProperty("open")]
         public string Open { get; set; }

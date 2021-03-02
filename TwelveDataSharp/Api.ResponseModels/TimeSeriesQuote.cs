@@ -1,20 +1,24 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using Newtonsoft.Json;
 
-namespace TwelveDataSharp.Models
+namespace TwelveDataSharp.Api.ResponseModels
 {
     class TimeSeriesQuote
     {
         [JsonProperty("symbol")]
         public string Symbol { get; set; }
 
+        [JsonProperty("exchange")]
+        public string Exchange { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("currency")]
+        public string Currency { get; set; }
+
         [JsonProperty("datetime")]
-        public DateTimeOffset Datetime { get; set; }
+        public DateTime Datetime { get; set; }
 
         [JsonProperty("open")]
         public string Open { get; set; }
